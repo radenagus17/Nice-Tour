@@ -21,6 +21,7 @@ const config = {
     extend: {
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
+        poppins: ["var(--font-poppins)", ...fontFamily.sans],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -56,6 +57,13 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        "flysha-light-purple": "#B88DFF",
+        "flysha-black": "#080318",
+        "flysha-off-purple": "#AEA6C7",
+        "flysha-bg-purple": "#1D1730",
+        "flysha-red": "#FF2A2A",
+        "flysha-grey": "#909296",
+        "flysha-dark-grey": "#393449",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -70,6 +78,10 @@ const config = {
         "accordion-up": {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
+        },
+        slide: {
+          "0%": { transform: "translateX(0%)" },
+          "100%": { transform: "translateX(-100%)" },
         },
       },
       animation: {

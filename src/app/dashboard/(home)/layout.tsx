@@ -32,12 +32,7 @@ export default async function HomeDashboardLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={cn(
-          "min-h-screen bg-background font-sans antialiased",
-          fontSans.variable
-        )}
-      >
+      <body className={`${fontSans.variable} bg-background font-sans`}>
         <main>
           <nav className="border-b border-muted p-5">
             <div className="flex flex-row items-center justify-between">
@@ -94,9 +89,9 @@ export default async function HomeDashboardLayout({
                   asChild
                   className="w-full justify-start"
                 >
-                  <Link href={"/dashboard/users"}>
+                  <Link href={"/dashboard/customers"}>
                     <User className="w-4 h-4 mr-2" />
-                    Users
+                    Customers
                   </Link>
                 </Button>
               </div>
