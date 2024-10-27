@@ -10,6 +10,7 @@ import React, {
   useReducer,
 } from "react";
 import axios from "axios";
+import { useSearchParams } from "next/navigation";
 
 interface FlightProviderProps {
   children: ReactNode;
@@ -18,6 +19,7 @@ interface FlightProviderProps {
 export enum FilterActionKind {
   ADD_PLANE = "ADD_PLANE",
   REMOVE_PLANE = "REMOVE_PLANE",
+  SET_SEAT = "SET_SEAT",
 }
 
 type FilterState = {
@@ -41,13 +43,19 @@ function filterReducer(state: FilterState, action: FilterAction): FilterState {
     case FilterActionKind.ADD_PLANE:
       return {
         ...state,
-        planeIds: [...state.planeIds, payload.planeId],
+        planeIds: [...state.planeIds, payload?.planeId as string],
       };
 
     case FilterActionKind.REMOVE_PLANE:
       return {
         ...state,
         planeIds: state.planeIds.filter((item) => item !== payload.planeId),
+      };
+
+    case FilterActionKind.SET_SEAT:
+      return {
+        ...state,
+        seat: payload.seat,
       };
 
     default:
@@ -63,15 +71,24 @@ export type FContext = {
   flights: FlightWithPlane[] | undefined;
   isLoading: boolean;
   dispatch: Dispatch<FilterAction>;
+  state: FilterState;
 };
 
 export const FlightContext = createContext<FContext | null>(null);
 
 const FlightProvider: FC<FlightProviderProps> = ({ children }) => {
+  const search = useSearchParams();
+
+  const params = {
+    departure: search.get("departure"),
+    arrival: search.get("arrival"),
+    date: search.get("date"),
+  };
+
   const [state, dispatch] = useReducer(filterReducer, {
-    departure: null,
-    arrival: null,
-    date: null,
+    departure: params.departure,
+    arrival: params.arrival,
+    date: params.date,
     planeId: "",
     planeIds: [],
     seat: null,
@@ -83,7 +100,9 @@ const FlightProvider: FC<FlightProviderProps> = ({ children }) => {
   });
 
   return (
-    <FlightContext.Provider value={{ flights: data, isLoading, dispatch }}>
+    <FlightContext.Provider
+      value={{ flights: data, isLoading, dispatch, state }}
+    >
       {children}
     </FlightContext.Provider>
   );

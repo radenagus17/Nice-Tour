@@ -1,14 +1,46 @@
+"use client";
 import Image from "next/image";
-import React, { FC } from "react";
-import { FlightWithPlane } from "../providers/flight-provider";
+import React, { FC, useContext, useMemo } from "react";
+import {
+  FContext,
+  FlightContext,
+  FlightWithPlane,
+} from "../providers/flight-provider";
 import { getUrlFile } from "@/lib/supabase";
-import { dateFormat, rupiahFormat } from "@/lib/utils";
+import {
+  CHECKOUT_KEY,
+  dateFormat,
+  rupiahFormat,
+  SEAT_VALUES,
+  SeatValuesType,
+} from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface FlightItemProps {
   data: FlightWithPlane;
 }
 
 const FlightItem: FC<FlightItemProps> = ({ data }) => {
+  const { state } = useContext(FlightContext) as FContext;
+
+  const { push } = useRouter();
+
+  const selectedSeat = useMemo(() => {
+    return SEAT_VALUES[(state.seat as SeatValuesType) ?? "ECONOMY"];
+  }, [state.seat]);
+
+  const bookNow = () => {
+    sessionStorage.setItem(
+      CHECKOUT_KEY,
+      JSON.stringify({
+        id: data.id,
+        seat: state.seat ?? "ECONOMY",
+      })
+    );
+
+    push(`/choose-seat/${data.id}`);
+  };
+
   return (
     <div className="ticket-card flex justify-between items-center rounded-[20px] p-5 bg-flysha-bg-purple">
       <div className="flex gap-[16px] items-center">
@@ -23,7 +55,9 @@ const FlightItem: FC<FlightItemProps> = ({ data }) => {
         </div>
         <div className="flex flex-col justify-center-center gap-[2px]">
           <p className="font-bold text-lg">{data.plane.name}</p>
-          <p className="text-sm text-flysha-off-purple">Business Class</p>
+          <p className="text-sm text-flysha-off-purple">
+            {selectedSeat?.label} Class
+          </p>
         </div>
       </div>
       <div className="flex items-center gap-[30px]">
@@ -51,14 +85,15 @@ const FlightItem: FC<FlightItemProps> = ({ data }) => {
         </div>
       </div>
       <p className="w-fit h-fit font-bold text-lg">
-        {rupiahFormat(data.price)}
+        {rupiahFormat(data.price + selectedSeat?.additionalPrice)}
       </p>
-      <a
-        href="#"
+      <button
+        type="button"
+        onClick={bookNow}
         className="font-bold text-flysha-black bg-flysha-light-purple rounded-full p-[12px_20px] h-[48px] transition-all duration-300 hover:shadow-[0_10px_20px_0_#B88DFF]"
       >
         Book Flight
-      </a>
+      </button>
     </div>
   );
 };

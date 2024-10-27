@@ -3,6 +3,25 @@ import { type ClassValue, clsx } from "clsx";
 import dayjs from "dayjs";
 import { twMerge } from "tailwind-merge";
 
+export const CHECKOUT_KEY = "CHECKOUT_KEY";
+
+export const SEAT_VALUES = {
+  ECONOMY: {
+    label: "Economy",
+    additionalPrice: 0,
+  },
+  BUSINESS: {
+    label: "Business",
+    additionalPrice: 500000,
+  },
+  FIRST: {
+    label: "First",
+    additionalPrice: 750000,
+  },
+};
+
+export type SeatValuesType = keyof typeof SEAT_VALUES;
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -80,3 +99,18 @@ export function mappingSeats(seats: FlightSeat[]): {
     totalSeatFirst,
   };
 }
+
+export const objectToParams = (obj: { [key: string]: unknown }) => {
+  const queryParams = Object.keys(obj)
+    .map((key) => {
+      if (obj[key] !== null) {
+        return `${key}=${obj[key]}`;
+      }
+
+      return "";
+    })
+    .filter((key) => key !== "")
+    .join("&");
+
+  return queryParams;
+};
