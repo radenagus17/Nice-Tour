@@ -7,7 +7,7 @@ interface SeatItemProps {
 }
 
 const SeatItem: FC<SeatItemProps> = ({ seat }) => {
-  const { setSelectedSeat } = useContext(SeatContext) as SeatContextType;
+  const { selectSeat } = useContext(SeatContext) as SeatContextType;
 
   return (
     <div className="group flex shrink-0 w-[60px] h-[60px] items-center justify-center relative">
@@ -21,7 +21,7 @@ const SeatItem: FC<SeatItemProps> = ({ seat }) => {
         type="radio"
         name="seat"
         id={seat.seatNumber}
-        onClick={() => setSelectedSeat(seat)}
+        onClick={() => selectSeat(seat)}
         className="w-[60px] h-[60px] appearance-none rounded-[15px] checked:bg-flysha-light-purple ring-2 ring-white checked:ring-flysha-light-purple disabled:ring-0 disabled:bg-flysha-dark-grey"
         disabled={seat.isBooked ?? false}
       />

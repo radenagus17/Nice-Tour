@@ -26,21 +26,30 @@ interface FlightDetailProps {
 
 const FlightDetail: FC<FlightDetailProps> = ({ flight, session }) => {
   const data = useCheckoutData();
-  const { seat } = useContext(SeatContext) as SeatContextType;
+  const { selectedSeat } = useContext(SeatContext) as SeatContextType;
 
   const { replace, push } = useRouter();
 
-  const selectedSeat = useMemo(() => {
+  const cacheSelectedSeat = useMemo(() => {
     return SEAT_VALUES[(data.data?.seat as SeatValuesType) ?? "ECONOMY"];
   }, [data.data?.seat]);
 
   const continueCheckout = () => {
-    if (seat === null) {
-      toast.warning("Please select seat to continue");
-      return;
-    }
-    if (session === null) {
-      replace("/sign-in");
+    const validateBeforeCheckout = () => {
+      if (selectedSeat === null) {
+        toast.warning("Please select seat to continue");
+        return false;
+      }
+
+      if (session === null) {
+        replace("/sign-in");
+        return false;
+      }
+
+      return true;
+    };
+
+    if (!validateBeforeCheckout()) {
       return;
     }
 
@@ -48,7 +57,7 @@ const FlightDetail: FC<FlightDetailProps> = ({ flight, session }) => {
       id: data.data?.id,
       seat: data.data?.seat,
       flightDetail: flight,
-      seatDetail: seat,
+      seatDetail: selectedSeat!,
     };
 
     sessionStorage.setItem(CHECKOUT_KEY, JSON.stringify(checkoutData));
@@ -99,7 +108,7 @@ const FlightDetail: FC<FlightDetailProps> = ({ flight, session }) => {
             <div className="flex flex-col gap-[2px]">
               <p className="font-bold text-lg">{flight.plane.name}</p>
               <p className="text-sm text-flysha-grey">
-                {flight.plane.code} • {selectedSeat.label}
+                {flight.plane.code} • {cacheSelectedSeat.label}
               </p>
             </div>
             <div className="flex h-fit">
@@ -140,7 +149,7 @@ const FlightDetail: FC<FlightDetailProps> = ({ flight, session }) => {
           </div>
           <div className="flex justify-between">
             <span>Seat Choosen</span>
-            <span className="font-semibold">{seat?.seatNumber}</span>
+            <span className="font-semibold">{selectedSeat?.seatNumber}</span>
           </div>
           <div className="flex justify-between">
             <span>Passenger</span>
@@ -149,7 +158,7 @@ const FlightDetail: FC<FlightDetailProps> = ({ flight, session }) => {
           <div className="flex justify-between">
             <span>Seat Price</span>
             <span className="font-semibold">
-              {rupiahFormat(flight.price + selectedSeat.additionalPrice)}
+              {rupiahFormat(flight.price + cacheSelectedSeat.additionalPrice)}
             </span>
           </div>
         </div>

@@ -1,28 +1,51 @@
 import { FlightSeat } from "@prisma/client";
-import { createContext, FC, ReactNode, useState } from "react";
+import { createContext, FC, ReactNode, useState, useContext } from "react";
 
+// Tipe untuk nilai context
+export interface SeatContextType {
+  selectedSeat: FlightSeat | null;
+  selectSeat: (seat: FlightSeat) => void;
+  clearSeat: () => void;
+}
+
+// Props untuk SeatProvider
 interface SeatProviderProps {
   children: ReactNode;
 }
 
-export type SeatContextType = {
-  seat: FlightSeat | null;
-  setSelectedSeat: (seat: FlightSeat) => void;
-};
-
+// Membuat context dengan nilai default null
 export const SeatContext = createContext<SeatContextType | null>(null);
 
-const SeatProvider: FC<SeatProviderProps> = ({ children }) => {
-  const [seat, setSeat] = useState<FlightSeat | null>(null);
+// Hook custom untuk menggunakan SeatContext
+export const useSeatContext = () => {
+  const context = useContext(SeatContext);
 
-  const setSelectedSeat = (seat: FlightSeat) => {
-    setSeat(seat);
+  if (!context) {
+    throw new Error("useSeatContext harus digunakan di dalam SeatProvider");
+  }
+
+  return context;
+};
+
+const SeatProvider: FC<SeatProviderProps> = ({ children }) => {
+  const [selectedSeat, setSelectedSeat] = useState<FlightSeat | null>(null);
+
+  const selectSeat = (seat: FlightSeat) => {
+    setSelectedSeat(seat);
+  };
+
+  const clearSeat = () => {
+    setSelectedSeat(null);
+  };
+
+  const contextValue: SeatContextType = {
+    selectedSeat,
+    selectSeat,
+    clearSeat,
   };
 
   return (
-    <SeatContext.Provider value={{ seat, setSelectedSeat }}>
-      {children}
-    </SeatContext.Provider>
+    <SeatContext.Provider value={contextValue}>{children}</SeatContext.Provider>
   );
 };
 
